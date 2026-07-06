@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "MindMirror AI",
+    "slug": "emotiondairy",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "scheme": "mindmirror",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0B"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yantenglong.mindmirror",
+      "buildNumber": "1"
+    },
+    "android": {
+      "package": "com.yantenglong.mindmirror",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0A0A0B"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "f3ddd56f-9c61-4891-bb9c-6f3b7834a8a1"
+      }
+    }
+  }
+}

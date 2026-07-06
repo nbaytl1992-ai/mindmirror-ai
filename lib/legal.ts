@@ -1,6 +1,6 @@
 /** Public legal URLs (GitHub Pages). Must match App Store Connect metadata. */
 export const PRIVACY_POLICY_URL =
-  'https://jim1992nba.github.io/mindmirror-ai/privacy.html';
+  'https://nbaytl1992-ai.github.io/mindmirror-ai/privacy.html';
 
 export const TERMS_OF_USE_URL =
   'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';

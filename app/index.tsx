@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import { useRouter } from 'expo-router';
 import {
   View,
@@ -6,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  TextInput,
 } from 'react-native';
 import { useJournal } from '../hooks/useJournal';
 import { useSubscription } from '../hooks/useSubscription';
@@ -45,6 +47,7 @@ function EntryCard({ entry }: { entry: JournalEntry }) {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
   const { entries, todayWritten, getEntriesForDateRange } = useJournal();
   const { tier } = useSubscription();
   const streak = getStreak(entries);
@@ -53,6 +56,31 @@ export default function HomeScreen() {
     tier === 'premium'
       ? entries
       : getEntriesForDateRange(FREE_HISTORY_DAYS);
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredEntries = useMemo(() => {
+    if (!normalizedQuery) return visibleEntries;
+
+    return visibleEntries.filter((entry) => {
+      const d = new Date(entry.date);
+      const searchableText = [
+        entry.content,
+        entry.emotion,
+        entry.aiPrompt,
+        entry.aiResponse,
+        `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`,
+        `${d.getMonth() + 1}月${d.getDate()}日`,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      return searchableText.includes(normalizedQuery);
+    });
+  }, [normalizedQuery, visibleEntries]);
+  const isSearching = normalizedQuery.length > 0;
+  const entryCountLabel = isSearching
+    ? `${filteredEntries.length}/${visibleEntries.length}`
+    : visibleEntries.length;
 
   return (
     <View style={styles.container}>
@@ -77,7 +105,7 @@ export default function HomeScreen() {
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>
-            日记记录 ({visibleEntries.length})
+            日记记录 ({entryCountLabel})
           </Text>
           {tier === 'free' && (
             <Text style={styles.limitBadge}>
@@ -85,14 +113,31 @@ export default function HomeScreen() {
           )}
         </View>
 
+        <TextInput
+          style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="搜索日记、心情或 AI 回复"
+          placeholderTextColor={COLORS.textDim}
+          autoCapitalize="none"
+          autoCorrect={false}
+          clearButtonMode="while-editing"
+        />
+
         {visibleEntries.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyEmoji}>📝</Text>
             <Text style={styles.emptyText}>还没有日记</Text>
             <Text style={styles.emptySub}>点击下方按钮开始第一篇</Text>
           </View>
+        ) : filteredEntries.length === 0 ? (
+          <View style={styles.empty}>
+            <Text style={styles.emptyEmoji}>🔎</Text>
+            <Text style={styles.emptyText}>没有找到相关日记</Text>
+            <Text style={styles.emptySub}>换个关键词再试试</Text>
+          </View>
         ) : (
-          visibleEntries.map((entry) => (
+          filteredEntries.map((entry) => (
             <EntryCard key={entry.id} entry={entry} />
           ))
         )}
@@ -178,6 +223,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 12,
+  },
+  searchInput: {
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 14,
+    color: COLORS.text,
+    fontSize: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 12,
   },
   card: {
     backgroundColor: COLORS.surface,
